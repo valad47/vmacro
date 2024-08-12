@@ -53,7 +53,8 @@ int createDevice(const char *devName){
      * created, to pass key events, in this case the space key.
      */
     ioctl(fd, UI_SET_EVBIT, EV_KEY);
-    ioctl(fd, UI_SET_KEYBIT, KEY_SPACE);
+    for(int i = 0; i <= 255; i++)
+        ioctl(fd, UI_SET_KEYBIT, i);
 
     memset(&usetup, 0, sizeof(usetup));
     usetup.id.bustype = BUS_USB;
