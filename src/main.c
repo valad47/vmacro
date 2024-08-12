@@ -92,7 +92,7 @@ void* readKeys(void* argv){
 
 void* doEvent(void* argv){
     while(msleep(1)){
-        if(keys[KEY_A] == 1 && keys[KEY_LEFTCTRL] == 1){
+        if(keys[KEY_Q] == 1 && keys[KEY_LEFTCTRL] == 1){
             system("notify-send \"vmacro\" \"Quiting...\"");
             _exit(0);
         }
@@ -124,24 +124,29 @@ void* executeMacro(void* argv){
     int fd = ((mac_arg*)argv)->fd;
     instruction_list* instructions = ((mac_arg*)argv)->instructions;
     instruction_list* iter = instructions;
-    while (iter != NULL){
-        if(in_execution == 0){
-            nsleep(500);
-            continue;
-        }
-        switch(iter->cmd){
-            case KEYPRESS:
-                keyEvent(fd, iter->val, iter->state);
-                break;
-            case DELAY:
-                msleep(iter->val);
-                break;
-            default:
-                printf("Unknown instruction\n");
-        }
+    while(1){
+        while (iter != NULL){
+            if(in_execution == 0){
+                nsleep(500);
+                continue;
+            }
+            switch(iter->cmd){
+                case KEYPRESS:
+                    keyEvent(fd, iter->val, iter->state);
+                    break;
+                case DELAY:
+                    msleep(iter->val);
+                    break;
+                default:
+                    printf("Unknown instruction\n");
+            }
 
-        iter = iter->next;
+            iter = iter->next;
+        }
+        in_execution = 0;
+        system("notify-send \"vmacro\" \"Macro execution is over\"");
     }
+    
     freeinstlist(instructions);
 }
 
