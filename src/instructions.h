@@ -1,16 +1,23 @@
 #pragma once
 #include "utils.h"
 
-#define DOWN 1UL
-#define UP 0UL
+// First bit //
 
-#define KEYPRESS 0UL
-#define DELAY 1UL
+#define DOWN 1
+#define UP 0
 
-#define STATEBITSHIFT 0
-#define CMDBITSHIFT 1
-#define VALBITSHIFT 32
+#define MILISECONDS 0
+#define SECONDS 1
 
-typedef uint64_t inst_t;
+// Second bit + 8
+
+#define KEYPRESS 1
+#define DELAY 2
+
+// Bit shifts
+
+#define STATEBITSHIFT   0
+#define CMDBITSHIFT     1
+#define VALBITSHIFT     32
 
 instruction_list* parseFile(char *path);
