@@ -10,24 +10,28 @@
 #define BUFSIZE 128
 
 void proccessCode(char *code, instruction_list *node){
+    inst_t res = 0;
+
     memset(node, 0, sizeof(instruction_list));
 
     char *word = strtok(code, " ");
     while (word != NULL){
         if (strcmp(word, "DOWN") == 0)
-            node->state = DOWN;
+            res |= DOWN << STATEBITSHIFT;
         if (strcmp(word, "UP") == 0)
-            node->state = UP;
+            res |= UP << STATEBITSHIFT;
         if (strcmp(word, "DELAY") == 0)
-            node->cmd = DELAY;
+            res |= DELAY << CMDBITSHIFT;
         if (strcmp(word, "KEYPRESS") == 0)
-            node->cmd = KEYPRESS;
-        int32_t val = strtoul(word, NULL, 10);
+            res |= KEYPRESS << CMDBITSHIFT;
+        inst_t val = strtoul(word, NULL, 10);
         if (val != 0)
-            node->val = val;
+            res |= val << VALBITSHIFT;
 
         word = strtok(NULL, " ");
     }
+
+    node->instruction = res;
 }
 
 instruction_list *parseFile(char *path){
