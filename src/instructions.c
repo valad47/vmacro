@@ -50,9 +50,7 @@ instruction_list *parseFile(char *path){
             i = -1;
             continue;
         }
-        printf("%c", symbol);
         buf[i] = symbol;
     }
-    printf("\n\n");
     return listHead;
 }
