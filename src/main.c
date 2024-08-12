@@ -76,13 +76,12 @@ int main(int argc, char **argv){
     /* Key press, report the event, send key release, and report again */
     instruction_list* instructions = parseFile(argv[1]);
     while (instructions != NULL){
-        inst_t inst = instructions->instruction;
-        printf("%d\t%d\t%d\n", (inst << VALBITSHIFT) >> VALBITSHIFT+CMDBITSHIFT, inst >> VALBITSHIFT, (inst << VALBITSHIFT + (VALBITSHIFT - CMDBITSHIFT)) >> VALBITSHIFT + (VALBITSHIFT - CMDBITSHIFT) + STATEBITSHIFT);
+        printf("%u\t%d\t%u\n", instructions->cmd, instructions->val, instructions->state);
 
         instructions = instructions->next;
     }
     
-
+    printf("%d", sizeof(instruction_list));
     /*
      * Give userspace some time to read the events before we destroy the
      * device with UI_DEV_DESTOY.

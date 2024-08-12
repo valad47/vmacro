@@ -2,7 +2,9 @@
 #include <stdint.h>
 
 struct instruction_list {
-    uint64_t instruction;
+    uint8_t state;
+    uint8_t cmd;
+    int32_t val;
     struct instruction_list *next;
 };
 
