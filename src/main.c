@@ -12,7 +12,8 @@
 
 #define KEYBOARD "/dev/input/by-path/platform-i8042-serio-0-event-kbd"
 
-uint8_t keys[255];
+uint8_t keys[255] = {0};
+uint8_t in_execution = 0;
 
 typedef struct{
     int fd;
@@ -95,6 +96,16 @@ void* doEvent(void* argv){
             system("notify-send \"vmacro\" \"Quiting...\"");
             _exit(0);
         }
+
+        if(keys[KEY_LEFTCTRL] == 1 && keys[KEY_LEFTBRACE] && in_execution == 0){
+            in_execution = 1;
+            system("notify-send \"vmacro\" \"Playing macro...\"");
+        }
+
+        if(keys[KEY_LEFTCTRL] == 1 && keys[KEY_RIGHTBRACE] && in_execution == 1){
+            in_execution = 0;
+            system("notify-send \"vmacro\" \"Macro execution is paused\"");
+        }
     }
     
 }
@@ -112,19 +123,24 @@ void keyEvent(int fd, int key, int state){
 void* executeMacro(void* argv){
     int fd = ((mac_arg*)argv)->fd;
     instruction_list* instructions = ((mac_arg*)argv)->instructions;
-    while (instructions != NULL){
-        switch(instructions->cmd){
+    instruction_list* iter = instructions;
+    while (iter != NULL){
+        if(in_execution == 0){
+            nsleep(500);
+            continue;
+        }
+        switch(iter->cmd){
             case KEYPRESS:
-                keyEvent(fd, instructions->val, instructions->state);
+                keyEvent(fd, iter->val, iter->state);
                 break;
             case DELAY:
-                msleep(instructions->val);
+                msleep(iter->val);
                 break;
             default:
                 printf("Unknown instruction\n");
         }
 
-        instructions = instructions->next;
+        iter = iter->next;
     }
     freeinstlist(instructions);
 }
@@ -144,9 +160,8 @@ int main(int argc, char **argv){
     mac_arg args = {fd, instructions};
     pthread_create(&macexec, NULL, executeMacro, &args);
 
-
-    //pthread_join(thread, NULL);
-    //pthread_join(thread2, NULL);
+    pthread_join(thread, NULL);
+    pthread_join(thread2, NULL);
 
     return 0;
 }
