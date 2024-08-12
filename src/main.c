@@ -14,6 +14,7 @@
 
 uint8_t keys[255] = {0};
 uint8_t in_execution = 0;
+int fd = 0;
 
 typedef struct{
     int fd;
@@ -76,6 +77,16 @@ int createDevice(const char *devName){
     return fd;
 }
 
+void deleteDevice(int fd){
+    ioctl(fd, UI_DEV_DESTROY);
+    close(fd);
+}
+
+void keyEvent(int fd, int key, int state){
+    emit(fd, EV_KEY, key, state);
+    emit(fd, EV_SYN, SYN_REPORT, 0);
+}
+
 void* readKeys(void* argv){
     int fd = open(KEYBOARD, O_RDONLY | O_NONBLOCK);
     while(msleep(1)){
@@ -104,20 +115,12 @@ void* doEvent(void* argv){
 
         if(keys[KEY_LEFTCTRL] == 1 && keys[KEY_RIGHTBRACE] && in_execution == 1){
             in_execution = 0;
+            for(int i = 0; i <= 255; i++)
+                keyEvent(fd, i, UP);
             system("notify-send \"vmacro\" \"Macro execution is paused\"");
         }
     }
     
-}
-
-void deleteDevice(int fd){
-    ioctl(fd, UI_DEV_DESTROY);
-    close(fd);
-}
-
-void keyEvent(int fd, int key, int state){
-    emit(fd, EV_KEY, key, state);
-    emit(fd, EV_SYN, SYN_REPORT, 0);
 }
 
 void* executeMacro(void* argv){
@@ -159,7 +162,7 @@ int main(int argc, char **argv){
     pthread_create(&thread, NULL, readKeys, NULL);   
     pthread_create(&thread2, NULL, doEvent, NULL); 
 
-    int fd = createDevice("vmacro");
+    fd = createDevice("vmacro");
     /* Key press, report the event, send key release, and report again */
     instruction_list* instructions = parseFile(argv[1]);
 
