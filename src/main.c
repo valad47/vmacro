@@ -144,6 +144,7 @@ void* executeMacro(void* argv){
             iter = iter->next;
         }
         in_execution = 0;
+        iter = instructions;
         system("notify-send \"vmacro\" \"Macro execution is over\"");
     }
     
