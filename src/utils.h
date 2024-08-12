@@ -9,3 +9,5 @@ struct instruction_list {
 };
 
 typedef struct instruction_list instruction_list;
+
+void freeinstlist(instruction_list *list);
