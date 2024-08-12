@@ -41,7 +41,7 @@ void emit(int fd, int type, int code, int val){
     ie.type = type;
     ie.code = code;
     ie.value = val;
-    /* timestamp values below are ignored */
+
     ie.time.tv_sec = 0;
     ie.time.tv_usec = 0;
 
@@ -63,19 +63,13 @@ int createDevice(const char *devName){
 
     memset(&usetup, 0, sizeof(usetup));
     usetup.id.bustype = BUS_USB;
-    usetup.id.vendor = 0x1623;  /* sample vendor */
-    usetup.id.product = 0x4701; /* sample product */
+    usetup.id.vendor = 0x1623;
+    usetup.id.product = 0x4701;
     strcpy(usetup.name, devName);
 
     ioctl(fd, UI_DEV_SETUP, &usetup);
     ioctl(fd, UI_DEV_CREATE);
-    /*
-     * On UI_DEV_CREATE the kernel will create the device node for this
-     * device. We are inserting a pause here so that userspace has time
-     * to detect, initialize the new device, and can start listening to
-     * the event, otherwise it will not notice the event we are about
-     * to send. This pause is only needed in our example code!
-     */
+
     msleep(100);
 
     return fd;
@@ -119,7 +113,6 @@ void* executeMacro(void* argv){
     int fd = ((mac_arg*)argv)->fd;
     instruction_list* instructions = ((mac_arg*)argv)->instructions;
     while (instructions != NULL){
-        printf("%d %d %d\n", instructions->cmd, instructions->val, instructions->state);
         switch(instructions->cmd){
             case KEYPRESS:
                 keyEvent(fd, instructions->val, instructions->state);
