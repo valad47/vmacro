@@ -11,6 +11,8 @@
 
 #define KEYBOARD "/dev/input/by-path/platform-i8042-serio-0-event-kbd"
 
+uint8_t keys[255];
+
 void msleep(int ms){
     struct timeval tv;
     tv.tv_sec = ms / 1000;
@@ -63,7 +65,7 @@ int createDevice(const char *devName){
     return fd;
 }
 
-void* detectKeys(void* argv){
+void* readKeys(void* argv){
     int fd = open(KEYBOARD, O_RDONLY | O_NONBLOCK);
     while(1){
         struct input_event event;
@@ -71,8 +73,19 @@ void* detectKeys(void* argv){
             continue;
         }
 
-        printf("[ %d ] Type: %d\tCode: %d\tValue: %d\n", event.time.tv_sec, event.type, event.code, event.value);
+        if(event.type == EV_KEY){
+            keys[event.code] = event.value > 0 ? 1 : 0;
+        }
     }
+}
+
+void* doEvent(void* argv){
+    while(1){
+        if(keys[KEY_A] == 1 && keys[KEY_LEFTCTRL] == 1){
+            _exit(0);
+        }
+    }
+    
 }
 
 void deleteDevice(int fd){
@@ -87,8 +100,10 @@ void keyEvent(int fd, int key, int state){
 
 int main(int argc, char **argv){
     pthread_t thread;
+    pthread_t thread2;
 
-    pthread_create(&thread, NULL, detectKeys, NULL);    
+    pthread_create(&thread, NULL, readKeys, NULL);   
+    pthread_create(&thread2, NULL, doEvent, NULL); 
 
     //int fd = createDevice("vmacro");
     /* Key press, report the event, send key release, and report again */
@@ -107,6 +122,7 @@ int main(int argc, char **argv){
     //msleep(1000);
 
     pthread_join(thread, NULL);
+    pthread_join(thread2, NULL);
 
     return 0;
 }
