@@ -3,6 +3,7 @@
 #include <time.h>
 #include <fcntl.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/time.h>
 #include <pthread.h>
@@ -13,11 +14,20 @@
 
 uint8_t keys[255];
 
-void msleep(int ms){
+int msleep(int ms){
     struct timeval tv;
     tv.tv_sec = ms / 1000;
     tv.tv_usec = (ms % 1000) * 1000;
     select(0, NULL, NULL, NULL, &tv);
+    return 1;
+}
+
+int nsleep(int ms){
+    struct timeval tv;
+    tv.tv_sec = ms / 1000;
+    tv.tv_usec = (ms % 1000000);
+    select(0, NULL, NULL, NULL, &tv);
+    return 1;
 }
 
 void emit(int fd, int type, int code, int val){
@@ -67,7 +77,7 @@ int createDevice(const char *devName){
 
 void* readKeys(void* argv){
     int fd = open(KEYBOARD, O_RDONLY | O_NONBLOCK);
-    while(1){
+    while(msleep(1)){
         struct input_event event;
         if(read(fd, &event, sizeof(struct input_event)) == -1){
             continue;
@@ -80,8 +90,9 @@ void* readKeys(void* argv){
 }
 
 void* doEvent(void* argv){
-    while(1){
+    while(msleep(1)){
         if(keys[KEY_A] == 1 && keys[KEY_LEFTCTRL] == 1){
+            system("notify-send \"vmacro\" \"Quiting...\"");
             _exit(0);
         }
     }
