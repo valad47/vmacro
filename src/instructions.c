@@ -62,5 +62,7 @@ instruction_list *parseFile(char *path){
         }
         buf[i] = symbol;
     }
+
+    fclose(fd);
     return listHead;
 }

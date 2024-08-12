@@ -116,24 +116,35 @@ int main(int argc, char **argv){
     pthread_create(&thread, NULL, readKeys, NULL);   
     pthread_create(&thread2, NULL, doEvent, NULL); 
 
-    //int fd = createDevice("vmacro");
+    int fd = createDevice("vmacro");
     /* Key press, report the event, send key release, and report again */
     instruction_list* instructions = parseFile(argv[1]);
     while (instructions != NULL){
-        printf("%u\t%d\t%u\n", instructions->cmd, instructions->val, instructions->state);
+        printf("%d %d %d\n", instructions->cmd, instructions->val, instructions->state);
+        switch(instructions->cmd){
+            case KEYPRESS:
+                keyEvent(fd, instructions->val, instructions->state);
+                break;
+            case DELAY:
+                msleep(instructions->val);
+                break;
+            default:
+                printf("Unknown instruction\n");
+        }
 
         instructions = instructions->next;
     }
+    printf("End execution of macro\n");
 
     freeinstlist(instructions);
     /*
      * Give userspace some time to read the events before we destroy the
      * device with UI_DEV_DESTOY.
      */
-    //msleep(1000);
+    msleep(1000);
 
-    pthread_join(thread, NULL);
-    pthread_join(thread2, NULL);
+    //pthread_join(thread, NULL);
+    //pthread_join(thread2, NULL);
 
     return 0;
 }
