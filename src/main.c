@@ -5,8 +5,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/time.h>
+#include <pthread.h>
 
 #include "instructions.h"
+
+#define KEYBOARD "/dev/input/by-path/platform-i8042-serio-0-event-kbd"
 
 void msleep(int ms){
     struct timeval tv;
@@ -60,6 +63,18 @@ int createDevice(const char *devName){
     return fd;
 }
 
+void* detectKeys(void* argv){
+    int fd = open(KEYBOARD, O_RDONLY | O_NONBLOCK);
+    while(1){
+        struct input_event event;
+        if(read(fd, &event, sizeof(struct input_event)) == -1){
+            continue;
+        }
+
+        printf("[ %d ] Type: %d\tCode: %d\tValue: %d\n", event.time.tv_sec, event.type, event.code, event.value);
+    }
+}
+
 void deleteDevice(int fd){
     ioctl(fd, UI_DEV_DESTROY);
     close(fd);
@@ -71,6 +86,9 @@ void keyEvent(int fd, int key, int state){
 }
 
 int main(int argc, char **argv){
+    pthread_t thread;
+
+    pthread_create(&thread, NULL, detectKeys, NULL);    
 
     //int fd = createDevice("vmacro");
     /* Key press, report the event, send key release, and report again */
@@ -80,13 +98,15 @@ int main(int argc, char **argv){
 
         instructions = instructions->next;
     }
-    
-    printf("%d", sizeof(instruction_list));
+
+    freeinstlist(instructions);
     /*
      * Give userspace some time to read the events before we destroy the
      * device with UI_DEV_DESTOY.
      */
     //msleep(1000);
+
+    pthread_join(thread, NULL);
 
     return 0;
 }
