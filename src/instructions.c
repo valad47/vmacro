@@ -34,6 +34,12 @@ instruction_list *parseFile(char *path){
     FILE *fd = fopen(path, "r");
 
     instruction_list *listHead = malloc(sizeof(struct instruction_list));
+    if(listHead == NULL){
+        perror("Failed to allocate memory for list");
+        exit(1);
+    }
+    
+
     instruction_list *last = listHead;
 
     char buf[BUFSIZE] = {0};
@@ -45,6 +51,10 @@ instruction_list *parseFile(char *path){
                 break;
             
             last->next = malloc(sizeof(instruction_list));
+            if(last->next == NULL){
+                perror("Failed to allocate memory for list");
+                exit(1);
+            }
             last = last->next;
             memset(buf, 0, BUFSIZE);
             i = -1;
