@@ -14,6 +14,11 @@
 
 uint8_t keys[255];
 
+typedef struct{
+    int fd;
+    instruction_list* instructions;
+} mac_arg;
+
 int msleep(int ms){
     struct timeval tv;
     tv.tv_sec = ms / 1000;
@@ -110,16 +115,9 @@ void keyEvent(int fd, int key, int state){
     emit(fd, EV_SYN, SYN_REPORT, 0);
 }
 
-int main(int argc, char **argv){
-    pthread_t thread;
-    pthread_t thread2;
-
-    pthread_create(&thread, NULL, readKeys, NULL);   
-    pthread_create(&thread2, NULL, doEvent, NULL); 
-
-    int fd = createDevice("vmacro");
-    /* Key press, report the event, send key release, and report again */
-    instruction_list* instructions = parseFile(argv[1]);
+void* executeMacro(void* argv){
+    int fd = ((mac_arg*)argv)->fd;
+    instruction_list* instructions = ((mac_arg*)argv)->instructions;
     while (instructions != NULL){
         printf("%d %d %d\n", instructions->cmd, instructions->val, instructions->state);
         switch(instructions->cmd){
@@ -135,14 +133,24 @@ int main(int argc, char **argv){
 
         instructions = instructions->next;
     }
-    printf("End execution of macro\n");
-
     freeinstlist(instructions);
-    /*
-     * Give userspace some time to read the events before we destroy the
-     * device with UI_DEV_DESTOY.
-     */
-    msleep(1000);
+}
+
+int main(int argc, char **argv){
+    pthread_t thread;
+    pthread_t thread2;
+    pthread_t macexec;
+
+    pthread_create(&thread, NULL, readKeys, NULL);   
+    pthread_create(&thread2, NULL, doEvent, NULL); 
+
+    int fd = createDevice("vmacro");
+    /* Key press, report the event, send key release, and report again */
+    instruction_list* instructions = parseFile(argv[1]);
+
+    mac_arg args = {fd, instructions};
+    pthread_create(&macexec, NULL, executeMacro, &args);
+
 
     //pthread_join(thread, NULL);
     //pthread_join(thread2, NULL);
