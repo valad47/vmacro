@@ -14,6 +14,7 @@
 
 uint8_t keys[255] = {0};
 uint8_t in_execution = 0;
+uint8_t repeat = 0;
 int fd = 0;
 
 typedef struct{
@@ -119,6 +120,11 @@ void* doEvent(void* argv){
                 keyEvent(fd, i, UP);
             system("notify-send \"vmacro\" \"Macro execution is paused\"");
         }
+
+        if(keys[KEY_R] == 1 && keys[KEY_LEFTCTRL] && repeat == 0){
+            repeat = 1;
+            system("notify-send \"vmacro\" \"Macro is set to repeat\"");
+        }
     }
     
 }
@@ -145,6 +151,10 @@ void* executeMacro(void* argv){
             }
 
             iter = iter->next;
+        }
+        if(repeat == 1){
+            iter = instructions;
+            continue;
         }
         in_execution = 0;
         iter = instructions;
