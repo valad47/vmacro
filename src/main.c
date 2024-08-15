@@ -30,10 +30,10 @@ int msleep(int ms){
     return 1;
 }
 
-int nsleep(int ms){
+int nsleep(int ns){
     struct timeval tv;
-    tv.tv_sec = ms / 1000;
-    tv.tv_usec = (ms % 1000000);
+    tv.tv_sec = ns / 1000;
+    tv.tv_usec = (ns % 1000000);
     select(0, NULL, NULL, NULL, &tv);
     return 1;
 }
@@ -100,6 +100,7 @@ void* readKeys(void* argv){
             keys[event.code] = event.value > 0 ? 1 : 0;
         }
     }
+    return NULL;
 }
 
 void* doEvent(void* argv){
@@ -124,9 +125,9 @@ void* doEvent(void* argv){
         if(keys[KEY_R] == 1 && keys[KEY_LEFTCTRL] && repeat == 0){
             repeat = 1;
             system("notify-send \"vmacro\" \"Macro is set to repeat\"");
-        }
-    }
-    
+        }   
+    } 
+    return NULL;
 }
 
 void* executeMacro(void* argv){
