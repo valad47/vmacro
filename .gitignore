@@ -2,3 +2,5 @@
 build
 *.vmac
 bitmap
+compile_commands.json
+.cache
