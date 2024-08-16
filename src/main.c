@@ -13,7 +13,7 @@
 #define KEYBOARD "/dev/input/by-path/platform-i8042-serio-0-event-kbd"
 
 uint8_t keys[255] = {0};
-uint8_t in_execution = 0;
+bool in_execution = 0;
 uint8_t repeat = 0;
 int fd = 0;
 
@@ -111,12 +111,12 @@ void* doEvent(void* argv){
         }
 
         if(keys[KEY_LEFTCTRL] == 1 && keys[KEY_LEFTBRACE] && in_execution == 0){
-            in_execution = 1;
+            in_execution = true;
             system("notify-send \"vmacro\" \"Playing macro...\"");
         }
 
         if(keys[KEY_LEFTCTRL] == 1 && keys[KEY_RIGHTBRACE] && in_execution == 1){
-            in_execution = 0;
+            in_execution = false;
             for(int i = 0; i <= 255; i++)
                 keyEvent(fd, i, UP);
             system("notify-send \"vmacro\" \"Macro execution is paused\"");
@@ -136,7 +136,7 @@ void* executeMacro(void* argv){
     instruction_list* iter = instructions;
     while(1){
         while (iter != NULL){
-            if(in_execution == 0){
+            if(!in_execution){
                 nsleep(500);
                 continue;
             }
@@ -157,7 +157,7 @@ void* executeMacro(void* argv){
             iter = instructions;
             continue;
         }
-        in_execution = 0;
+        in_execution = false;
         iter = instructions;
         system("notify-send \"vmacro\" \"Macro execution is over\"");
     }
