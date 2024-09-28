@@ -12,22 +12,23 @@
 void proccessCode(char *code, instruction_list *node){
     memset(node, 0, sizeof(instruction_list));
 
+    #define add_opt(a)\
+        if(strcmp(word, #a) == 0)\
+            node->state = a
+
     char *word = strtok(code, " ");
     while (word != NULL){
-        if (strcmp(word, "DOWN") == 0)
-            node->state = DOWN;
-        if (strcmp(word, "UP") == 0)
-            node->state = UP;
-        if (strcmp(word, "DELAY") == 0)
-            node->cmd = DELAY;
-        if (strcmp(word, "KEYPRESS") == 0)
-            node->cmd = KEYPRESS;
+        add_opt(DOWN);
+        add_opt(UP);
+        add_opt(DELAY);
+        add_opt(KEYPRESS);
         int32_t val = strtoul(word, NULL, 10);
         if (val != 0)
             node->val = val;
 
         word = strtok(NULL, " ");
     }
+    #undef add_opt
 }
 
 instruction_list *parseFile(char *path){
