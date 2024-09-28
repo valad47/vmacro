@@ -10,7 +10,7 @@
 
 #include "instructions.h"
 
-#define KEYBOARD "/dev/input/by-path/platform-i8042-serio-0-event-kbd"
+#define KEYBOARD "/dev/input/event0"
 
 uint8_t keys[255] = {0};
 bool in_execution = 0;
@@ -90,6 +90,10 @@ void keyEvent(int fd, int key, int state){
 
 void* readKeys(void* argv){
     int fd = open(KEYBOARD, O_RDONLY | O_NONBLOCK);
+    if(fd < 0){
+    	perror("Could not open keyboard");
+    	exit(1);
+    }
     while(msleep(1)){
         struct input_event event;
         if(read(fd, &event, sizeof(struct input_event)) == -1){
