@@ -166,6 +166,10 @@ void* executeMacro(void* argv){
 }
 
 int main(int argc, char **argv){
+    if(argc < 2){
+        printf("Usage:\n\t%s [*.vmac]", argv[0]);
+        return 0;
+    }
     pthread_t thread;
     pthread_t thread2;
     pthread_t macexec;
