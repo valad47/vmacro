@@ -61,7 +61,7 @@ int createDevice(const char *devName){
      * created, to pass key events, in this case the space key.
      */
     ioctl(fd, UI_SET_EVBIT, EV_KEY);
-    for(int i = 0; i <= 255; i++)
+    for(int i = 0; i <= KEY_MAX; i++)
         ioctl(fd, UI_SET_KEYBIT, i);
 
     memset(&usetup, 0, sizeof(usetup));
