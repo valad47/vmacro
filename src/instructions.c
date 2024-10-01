@@ -16,13 +16,16 @@ void proccessCode(char *code, instruction_list *node){
     #define add_opt(a)\
         if(strcmp(word, #a) == 0)\
             node->state = a
+    #define add_cmd(a)\
+        if(strcmp(word, #a) == 0)\
+            node->cmd = a
 
     char *word = strtok(code, " ");
     while (word != NULL){
         add_opt(DOWN);
         add_opt(UP);
-        add_opt(DELAY);
-        add_opt(KEYPRESS);
+        add_cmd(DELAY);
+        add_cmd(KEYPRESS);
         if(strncmp(word, "KEY_", 4) == 0)
             node->val = get_keycode(word, 4);
         int32_t val = strtoul(word, NULL, 10);
