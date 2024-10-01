@@ -56,7 +56,10 @@ int createDevice(const char *devName){
     struct uinput_setup usetup;
     
     int fd = open("/dev/uinput", O_WRONLY | O_NONBLOCK);
-
+    if(fd < 0){
+        perror("Failed to create macro virtual device");
+        exit(1);
+    }
     /*
      * The ioctls below will enable the device that is about to be
      * created, to pass key events, in this case the space key.
