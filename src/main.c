@@ -150,6 +150,8 @@ void* executeMacro(void* argv){
                 continue;
             }
             switch(iter->cmd){
+                case 0:
+                    break;
                 case KEYPRESS:
                     keyEvent(fd, iter->val, iter->state);
                     break;
