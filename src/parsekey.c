@@ -1,15 +1,299 @@
 #include <linux/uinput.h>
 #include <string.h>
 
-int get_keycode(char *str, int offset){
-    #define CASE(s)\
-        if(strcmp(str+offset, #s+offset) == 0)\
-            return s;
+int get_keycode(char *str, int offset) {
+#define CASE(s)                                                                \
+  if (strcmp(str + offset, #s + offset) == 0)                                  \
+    return s;
 
-    CASE(KEY_A)
-    CASE(KEY_S)
-    CASE(KEY_D)
-    CASE(KEY_F)
-    CASE(KEY_G)
-    return 0;
+  CASE(KEY_ESC)
+  CASE(KEY_1)
+  CASE(KEY_2)
+  CASE(KEY_3)
+  CASE(KEY_4)
+  CASE(KEY_5)
+  CASE(KEY_6)
+  CASE(KEY_7)
+  CASE(KEY_8)
+  CASE(KEY_9)
+  CASE(KEY_0)
+  CASE(KEY_MINUS)
+  CASE(KEY_EQUAL)
+  CASE(KEY_BACKSPACE)
+  CASE(KEY_TAB)
+  CASE(KEY_Q)
+  CASE(KEY_W)
+  CASE(KEY_E)
+  CASE(KEY_R)
+  CASE(KEY_T)
+  CASE(KEY_Y)
+  CASE(KEY_U)
+  CASE(KEY_I)
+  CASE(KEY_O)
+  CASE(KEY_P)
+  CASE(KEY_LEFTBRACE)
+  CASE(KEY_RIGHTBRACE)
+  CASE(KEY_ENTER)
+  CASE(KEY_LEFTCTRL)
+  CASE(KEY_A)
+  CASE(KEY_S)
+  CASE(KEY_D)
+  CASE(KEY_F)
+  CASE(KEY_G)
+  CASE(KEY_H)
+  CASE(KEY_J)
+  CASE(KEY_K)
+  CASE(KEY_L)
+  CASE(KEY_SEMICOLON)
+  CASE(KEY_APOSTROPHE)
+  CASE(KEY_GRAVE)
+  CASE(KEY_LEFTSHIFT)
+  CASE(KEY_BACKSLASH)
+  CASE(KEY_Z)
+  CASE(KEY_X)
+  CASE(KEY_C)
+  CASE(KEY_V)
+  CASE(KEY_B)
+  CASE(KEY_N)
+  CASE(KEY_M)
+  CASE(KEY_COMMA)
+  CASE(KEY_DOT)
+  CASE(KEY_SLASH)
+  CASE(KEY_RIGHTSHIFT)
+  CASE(KEY_KPASTERISK)
+  CASE(KEY_LEFTALT)
+  CASE(KEY_SPACE)
+  CASE(KEY_CAPSLOCK)
+  CASE(KEY_F1)
+  CASE(KEY_F2)
+  CASE(KEY_F3)
+  CASE(KEY_F4)
+  CASE(KEY_F5)
+  CASE(KEY_F6)
+  CASE(KEY_F7)
+  CASE(KEY_F8)
+  CASE(KEY_F9)
+  CASE(KEY_F10)
+  CASE(KEY_NUMLOCK)
+  CASE(KEY_SCROLLLOCK)
+  CASE(KEY_KP7)
+  CASE(KEY_KP8)
+  CASE(KEY_KP9)
+  CASE(KEY_KPMINUS)
+  CASE(KEY_KP4)
+  CASE(KEY_KP5)
+  CASE(KEY_KP6)
+  CASE(KEY_KPPLUS)
+  CASE(KEY_KP1)
+  CASE(KEY_KP2)
+  CASE(KEY_KP3)
+  CASE(KEY_KP0)
+  CASE(KEY_KPDOT)
+
+  CASE(KEY_ZENKAKUHANKAKU)
+  CASE(KEY_102ND)
+  CASE(KEY_F11)
+  CASE(KEY_F12)
+  CASE(KEY_RO)
+  CASE(KEY_KATAKANA)
+  CASE(KEY_HIRAGANA)
+  CASE(KEY_HENKAN)
+  CASE(KEY_KATAKANAHIRAGANA)
+  CASE(KEY_MUHENKAN)
+  CASE(KEY_KPJPCOMMA)
+  CASE(KEY_KPENTER)
+  CASE(KEY_RIGHTCTRL)
+  CASE(KEY_KPSLASH)
+  CASE(KEY_SYSRQ)
+  CASE(KEY_RIGHTALT)
+  CASE(KEY_LINEFEED)
+  CASE(KEY_HOME)
+  CASE(KEY_UP)
+  CASE(KEY_PAGEUP)
+  CASE(KEY_LEFT)
+  CASE(KEY_RIGHT)
+  CASE(KEY_END)
+  CASE(KEY_DOWN)
+  CASE(KEY_PAGEDOWN)
+  CASE(KEY_INSERT)
+  CASE(KEY_DELETE)
+  CASE(KEY_MACRO)
+  CASE(KEY_MUTE)
+  CASE(KEY_VOLUMEDOWN)
+  CASE(KEY_VOLUMEUP)
+  CASE(KEY_POWER) /* SC System Power Down */
+  CASE(KEY_KPEQUAL)
+  CASE(KEY_KPPLUSMINUS)
+  CASE(KEY_PAUSE)
+  CASE(KEY_SCALE) /* AL Compiz Scale (Expose) */
+
+  CASE(KEY_KPCOMMA)
+  CASE(KEY_HANGEUL)
+  CASE(KEY_HANGUEL)
+  CASE(KEY_HANJA)
+  CASE(KEY_YEN)
+  CASE(KEY_LEFTMETA)
+  CASE(KEY_RIGHTMETA)
+  CASE(KEY_COMPOSE)
+
+  CASE(KEY_STOP) /* AC Stop */
+  CASE(KEY_AGAIN)
+  CASE(KEY_PROPS) /* AC Properties */
+  CASE(KEY_UNDO)  /* AC Undo */
+  CASE(KEY_FRONT)
+  CASE(KEY_COPY)  /* AC Copy */
+  CASE(KEY_OPEN)  /* AC Open */
+  CASE(KEY_PASTE) /* AC Paste */
+  CASE(KEY_FIND)  /* AC Search */
+  CASE(KEY_CUT)   /* AC Cut */
+  CASE(KEY_HELP)  /* AL Integrated Help Center */
+  CASE(KEY_MENU)  /* Menu (show menu) */
+  CASE(KEY_CALC)  /* AL Calculator */
+  CASE(KEY_SETUP)
+  CASE(KEY_SLEEP)  /* SC System Sleep */
+  CASE(KEY_WAKEUP) /* System Wake Up */
+  CASE(KEY_FILE)   /* AL Local Machine Browser */
+  CASE(KEY_SENDFILE)
+  CASE(KEY_DELETEFILE)
+  CASE(KEY_XFER)
+  CASE(KEY_PROG1)
+  CASE(KEY_PROG2)
+  CASE(KEY_WWW) /* AL Internet Browser */
+  CASE(KEY_MSDOS)
+  CASE(KEY_COFFEE) /* AL Terminal Lock/Screensaver */
+  CASE(KEY_SCREENLOCK)
+  CASE(KEY_ROTATE_DISPLAY) /* Display orientation for e.g. tablets */
+  CASE(KEY_DIRECTION)
+  CASE(KEY_CYCLEWINDOWS)
+  CASE(KEY_MAIL)
+  CASE(KEY_BOOKMARKS) /* AC Bookmarks */
+  CASE(KEY_COMPUTER)
+  CASE(KEY_BACK)    /* AC Back */
+  CASE(KEY_FORWARD) /* AC Forward */
+  CASE(KEY_CLOSECD)
+  CASE(KEY_EJECTCD)
+  CASE(KEY_EJECTCLOSECD)
+  CASE(KEY_NEXTSONG)
+  CASE(KEY_PLAYPAUSE)
+  CASE(KEY_PREVIOUSSONG)
+  CASE(KEY_STOPCD)
+  CASE(KEY_RECORD)
+  CASE(KEY_REWIND)
+  CASE(KEY_PHONE) /* Media Select Telephone */
+  CASE(KEY_ISO)
+  CASE(KEY_CONFIG)   /* AL Consumer Control Configuration */
+  CASE(KEY_HOMEPAGE) /* AC Home */
+  CASE(KEY_REFRESH)  /* AC Refresh */
+  CASE(KEY_EXIT)     /* AC Exit */
+  CASE(KEY_MOVE)
+  CASE(KEY_EDIT)
+  CASE(KEY_SCROLLUP)
+  CASE(KEY_SCROLLDOWN)
+  CASE(KEY_KPLEFTPAREN)
+  CASE(KEY_KPRIGHTPAREN)
+  CASE(KEY_NEW)  /* AC New */
+  CASE(KEY_REDO) /* AC Redo/Repeat */
+
+  CASE(KEY_F13)
+  CASE(KEY_F14)
+  CASE(KEY_F15)
+  CASE(KEY_F16)
+  CASE(KEY_F17)
+  CASE(KEY_F18)
+  CASE(KEY_F19)
+  CASE(KEY_F20)
+  CASE(KEY_F21)
+  CASE(KEY_F22)
+  CASE(KEY_F23)
+  CASE(KEY_F24)
+
+  CASE(KEY_PLAYCD)
+  CASE(KEY_PAUSECD)
+  CASE(KEY_PROG3)
+  CASE(KEY_PROG4)
+  CASE(KEY_ALL_APPLICATIONS) /* AC Desktop Show All Applications */
+  CASE(KEY_DASHBOARD)
+  CASE(KEY_SUSPEND)
+  CASE(KEY_CLOSE) /* AC Close */
+  CASE(KEY_PLAY)
+  CASE(KEY_FASTFORWARD)
+  CASE(KEY_BASSBOOST)
+  CASE(KEY_PRINT) /* AC Print */
+  CASE(KEY_HP)
+  CASE(KEY_CAMERA)
+  CASE(KEY_SOUND)
+  CASE(KEY_QUESTION)
+  CASE(KEY_EMAIL)
+  CASE(KEY_CHAT)
+  CASE(KEY_SEARCH)
+  CASE(KEY_CONNECT)
+  CASE(KEY_FINANCE) /* AL Checkbook/Finance */
+  CASE(KEY_SPORT)
+  CASE(KEY_SHOP)
+  CASE(KEY_ALTERASE)
+  CASE(KEY_CANCEL) /* AC Cancel */
+  CASE(KEY_BRIGHTNESSDOWN)
+  CASE(KEY_BRIGHTNESSUP)
+  CASE(KEY_MEDIA)
+
+  CASE(KEY_SWITCHVIDEOMODE) /* Cycle between available video
+                                       outputs (Monitor/LCD/TV-out/etc) */
+  CASE(KEY_KBDILLUMTOGGLE)
+  CASE(KEY_KBDILLUMDOWN)
+  CASE(KEY_KBDILLUMUP)
+
+  CASE(KEY_SEND)        /* AC Send */
+  CASE(KEY_REPLY)       /* AC Reply */
+  CASE(KEY_FORWARDMAIL) /* AC Forward Msg */
+  CASE(KEY_SAVE)        /* AC Save */
+  CASE(KEY_DOCUMENTS)
+
+  CASE(KEY_BATTERY)
+
+  CASE(KEY_BLUETOOTH)
+  CASE(KEY_WLAN)
+  CASE(KEY_UWB)
+
+  CASE(KEY_UNKNOWN)
+
+  CASE(KEY_VIDEO_NEXT)       /* drive next video source */
+  CASE(KEY_VIDEO_PREV)       /* drive previous video source */
+  CASE(KEY_BRIGHTNESS_CYCLE) /* brightness up, after max is min */
+  CASE(KEY_BRIGHTNESS_AUTO)  /* Set Auto Brightness: manual
+                                       brightness control is off,
+                                       rely on ambient */
+  CASE(KEY_BRIGHTNESS_ZERO)
+  CASE(KEY_DISPLAY_OFF) /* display device to off state */
+
+  CASE(KEY_WWAN) /* Wireless WAN (LTE, UMTS, GSM, etc.) */
+  CASE(KEY_WIMAX)
+  CASE(KEY_RFKILL) /* Key that controls all radios */
+
+  CASE(KEY_MICMUTE) /* Mute / unmute the microphone */
+
+  /* Code 255 is reserved for special needs of AT keyboard driver */
+
+  CASE(BTN_MISC)
+  CASE(BTN_0)
+  CASE(BTN_1)
+  CASE(BTN_2)
+  CASE(BTN_3)
+  CASE(BTN_4)
+  CASE(BTN_5)
+  CASE(BTN_6)
+  CASE(BTN_7)
+  CASE(BTN_8)
+  CASE(BTN_9)
+
+  CASE(BTN_MOUSE)
+  CASE(BTN_LEFT)
+  CASE(BTN_RIGHT)
+  CASE(BTN_MIDDLE)
+  CASE(BTN_SIDE)
+  CASE(BTN_EXTRA)
+  CASE(BTN_FORWARD)
+  CASE(BTN_BACK)
+  CASE(BTN_TASK)
+
+  return 0;
 }
