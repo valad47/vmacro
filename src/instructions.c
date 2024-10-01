@@ -19,13 +19,21 @@ void proccessCode(char *code, instruction_list *node){
     #define add_cmd(a)\
         if(strcmp(word, #a) == 0)\
             node->cmd = a
+    #define add_val(a)\
+        if(strcmp(word, #a) == 0)\
+            node->val = a
 
     char *word = strtok(code, " ");
     while (word != NULL){
         add_opt(DOWN);
         add_opt(UP);
+
         add_cmd(DELAY);
         add_cmd(KEYPRESS);
+
+        add_val(MOUSE1);
+        add_val(MOUSE2);
+        add_val(MOUSE3);
         if(strncmp(word, "KEY_", 4) == 0)
             node->val = get_keycode(word, 4);
         int32_t val = strtoul(word, NULL, 10);
