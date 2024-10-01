@@ -9,6 +9,7 @@
 #include <pthread.h>
 
 #include "instructions.h"
+#include "debug.h"
 
 #define KEYBOARD "/dev/input/event0"
 
@@ -138,6 +139,7 @@ void* executeMacro(void* argv){
     int fd = ((mac_arg*)argv)->fd;
     instruction_list* instructions = ((mac_arg*)argv)->instructions;
     instruction_list* iter = instructions;
+    printInstructions(instructions);
     while(1){
         while (iter != NULL){
             if(!in_execution){
