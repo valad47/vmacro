@@ -47,6 +47,10 @@ void proccessCode(char *code, instruction_list *node){
 
 instruction_list *parseFile(char *path){
     FILE *fd = fopen(path, "r");
+    if (!fd){
+        perror("Failed to open file");
+        exit(1);
+    }
 
     instruction_list *listHead = malloc(sizeof(struct instruction_list));
     if(listHead == NULL){
