@@ -84,19 +84,12 @@ inst_head *parseFile(char *path){
         perror("Failed to open file");
         exit(1);
     }
-    #define allocate(var)     \
-        var = malloc(sizeof(typeof(var))); \
-        if(var == NULL){            \
-            perror("Failed to allocate memory");\
-            exit(1);\
-        }\
-        memset(var, 0, sizeof(typeof(var)));
 
     inst_head *inst_headp = malloc(sizeof(inst_head));
-        if(inst_headp == NULL){
-            perror("Failed to allocate memory");
-            exit(1);
-        }
+    if(inst_headp == NULL){
+        perror("Failed to allocate memory");
+        exit(1);
+    }
     inst_headp->instructions = malloc(sizeof(instruction_list));
     inst_headp->labels = malloc(sizeof(label));
     if(inst_headp->instructions == NULL || inst_headp->labels == NULL){
