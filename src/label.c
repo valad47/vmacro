@@ -15,25 +15,27 @@ void addLabel(label *labels, instruction_list *instruction){
     
     label *newLabel = malloc(sizeof(label));
     memset(newLabel, 0, sizeof(label));
-    newLabel->label = (char*)instruction->val;
+    newLabel->label = malloc(strlen((char*)instruction->val)+1);
+    strcpy(newLabel->label,  (char*)instruction->val);
     newLabel->instruction = instruction;
     labels->next = newLabel;
 }
 
 instruction_list* getInstruction(const label *labels, const instruction_list *instruction){
     if(instruction->cmd != GOTO){
-        perror("Provided instruction is not a GOTO");
+        printf("Provided instruction is not a GOTO");
         exit(1);
     }
 
-    while(labels->next != NULL) {
-        if(labels->label == NULL)
-            continue;
+
+    while(labels != NULL) {
         if(strcmp(labels->label, (char*)instruction->val) == 0)
             return labels->instruction;
+
+        labels = labels->next;
     }
 
-    perror("No label was found");
+    printf("No label was found");
     exit(1);
     return NULL;
 }

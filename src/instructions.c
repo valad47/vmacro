@@ -67,6 +67,7 @@ void proccessCode(char *code, instruction_list *node, label *labels){
             char* newWord = malloc(strlen(word)+1);
             strcpy(newWord, word);
             node->val = (int64_t)newWord;
+            return;
         }
 
         word = strtok(NULL, " ");
@@ -88,13 +89,22 @@ inst_head *parseFile(char *path){
         if(var == NULL){            \
             perror("Failed to allocate memory");\
             exit(1);\
+        }\
+        memset(var, 0, sizeof(typeof(var)));
+
+    inst_head *inst_headp = malloc(sizeof(inst_head));
+        if(inst_headp == NULL){
+            perror("Failed to allocate memory");
+            exit(1);
         }
-
-    inst_head *inst_headp;
-    allocate(inst_headp);
-    allocate(inst_headp->instructions);
-    allocate(inst_headp->labels);
-
+    inst_headp->instructions = malloc(sizeof(instruction_list));
+    inst_headp->labels = malloc(sizeof(label));
+    if(inst_headp->instructions == NULL || inst_headp->labels == NULL){
+        perror("Failed to allocate memory");
+        exit(1);
+    }
+    memset(inst_headp->labels, 0, sizeof(label));
+    inst_headp->labels->label = "";
     instruction_list *last = inst_headp->instructions;
 
     char *buf = malloc(BUFSIZE);
@@ -111,7 +121,7 @@ inst_head *parseFile(char *path){
             if(symbol == EOF)
                 break;
             
-            allocate(last->next);
+            last->next = malloc(sizeof(instruction_list));
             last = last->next;
             buf = realloc(buf, BUFSIZE);
             memset(buf, 0, BUFSIZE);
