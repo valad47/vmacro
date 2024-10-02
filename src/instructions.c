@@ -59,6 +59,7 @@ void proccessCode(char *code, instruction_list *node, label *labels){
         }
         add_if(GOTO){
             node->cmd = GOTO;
+            word = strtok(NULL, " ");
             if(word == NULL){
                 printf("No label specified\n");
                 exit(1);

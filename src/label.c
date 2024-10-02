@@ -14,6 +14,7 @@ void addLabel(label *labels, instruction_list *instruction){
         labels = labels->next;
     
     label *newLabel = malloc(sizeof(label));
+    memset(newLabel, 0, sizeof(label));
     newLabel->label = (char*)instruction->val;
     newLabel->instruction = instruction;
     labels->next = newLabel;
@@ -28,7 +29,7 @@ instruction_list* getInstruction(const label *labels, const instruction_list *in
     while(labels->next != NULL) {
         if(labels->label == NULL)
             continue;
-        if(strcmp(labels->label, (char*)instruction->val))
+        if(strcmp(labels->label, (char*)instruction->val) == 0)
             return labels->instruction;
     }
 
