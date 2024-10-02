@@ -4,8 +4,8 @@
 #include <linux/uinput.h>
 
 //Definition of key position
-#define DOWN 1
-#define UP 0
+#define DOWN 2
+#define UP 1
 
 //Posible instructions that macro uses
 #define KEYPRESS 1

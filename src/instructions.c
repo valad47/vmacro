@@ -47,9 +47,14 @@ void proccessCode(char *code, instruction_list *node){
         add_if(LABEL){
             node->cmd = LABEL;
             word = strtok(NULL, " ");
+            if(word == NULL){
+                printf("No label specified\n");
+                exit(1);
+            }
             char* newWord = malloc(strlen(word)+1);
             strcpy(newWord, word);
             node->val = (int64_t)newWord;
+            return;
         }
 
         word = strtok(NULL, " ");
@@ -80,8 +85,14 @@ inst_head *parseFile(char *path){
 
     instruction_list *last = inst_headp->instructions;
 
-    char buf[BUFSIZE] = {0};
+    char *buf = malloc(BUFSIZE);
+    int currentbuff = BUFSIZE;
     for (int i = 0;; i++){
+        if(i+1>currentbuff){
+            currentbuff += BUFSIZE;
+            buf = realloc(buf, currentbuff);
+            printf("New buffer size: %d\n", currentbuff);
+        }
         char symbol = getc(fd);
         if (symbol == '\n' || symbol == EOF){
             proccessCode(buf, last);
@@ -90,13 +101,15 @@ inst_head *parseFile(char *path){
             
             allocate(last->next);
             last = last->next;
+            buf = realloc(buf, BUFSIZE);
             memset(buf, 0, BUFSIZE);
+            currentbuff = BUFSIZE;
             i = -1;
             continue;
         }
         buf[i] = symbol;
     }
-
+    free(buf);
     fclose(fd);
     return inst_headp;
 }
