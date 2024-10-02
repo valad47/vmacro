@@ -156,10 +156,15 @@ void* executeMacro(void* argv){
                 case 0:
                     break;
                 case KEYPRESS:
-                    keyEvent(fd, iter->val, iter->state);
+                    keyEvent(fd, iter->val, iter->state-1);
                     break;
                 case DELAY:
                     msleep(iter->val);
+                    break;
+                case GOTO:
+                    break;
+                case LABEL:
+                    printf("%s\n", (char*)iter->val);
                     break;
                 default:
                     printf("Unknown instruction\n");
