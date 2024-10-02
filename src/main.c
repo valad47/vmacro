@@ -117,7 +117,7 @@ void* doEvent(void* argv){
     while(msleep(1)){
         if(keys[KEY_Q] == 1 && keys[KEY_LEFTCTRL] == 1){
             system("notify-send \"vmacro\" \"Quiting...\"");
-            _exit(0);
+            exit(0);
         }
 
         if(keys[KEY_LEFTCTRL] == 1 && keys[KEY_LEFTBRACE] && in_execution == 0){
@@ -199,7 +199,6 @@ int main(int argc, char **argv){
     pthread_create(&thread2, NULL, doEvent, NULL); 
 
     fd = createDevice("vmacro");
-    /* Key press, report the event, send key release, and report again */
     inst_head* instructions = parseFile(argv[1]);
 
     mac_arg args = {fd, instructions};
