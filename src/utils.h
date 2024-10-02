@@ -4,7 +4,7 @@
 struct instruction_list {
     uint8_t state;
     uint8_t cmd;
-    int32_t val;
+    int64_t val;
     struct instruction_list *next;
 };
 

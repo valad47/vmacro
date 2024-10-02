@@ -7,6 +7,7 @@
 #include "utils.h"
 #include "instructions.h"
 #include "parsekey.h"
+#include "label.h"
 
 #define BUFSIZE 128
 
@@ -22,6 +23,9 @@ void proccessCode(char *code, instruction_list *node){
     #define add_val(a)\
         if(strcmp(word, #a) == 0)\
             node->val = a
+
+    #define add_if(a)\
+        if(strcmp(word, #a) == 0)
 
     char *word = strtok(code, " ");
     while (word != NULL){
@@ -40,26 +44,41 @@ void proccessCode(char *code, instruction_list *node){
         if (val != 0)
             node->val = val;
 
+        add_if(LABEL){
+            node->cmd = LABEL;
+            word = strtok(NULL, " ");
+            char* newWord = malloc(strlen(word)+1);
+            strcpy(newWord, word);
+            node->val = (int64_t)newWord;
+        }
+
         word = strtok(NULL, " ");
     }
     #undef add_opt
+    #undef add_cmd
+    #undef add_val
+    #undef add_if
 }
 
-instruction_list *parseFile(char *path){
+inst_head *parseFile(char *path){
     FILE *fd = fopen(path, "r");
     if (!fd){
         perror("Failed to open file");
         exit(1);
     }
+    #define allocate(var)     \
+        var = malloc(sizeof(typeof(var))); \
+        if(var == NULL){            \
+            perror("Failed to allocate memory");\
+            exit(1);\
+        }
 
-    instruction_list *listHead = malloc(sizeof(struct instruction_list));
-    if(listHead == NULL){
-        perror("Failed to allocate memory for list");
-        exit(1);
-    }
-    
+    inst_head *inst_headp;
+    allocate(inst_headp);
+    allocate(inst_headp->instructions);
+    allocate(inst_headp->labels);
 
-    instruction_list *last = listHead;
+    instruction_list *last = inst_headp->instructions;
 
     char buf[BUFSIZE] = {0};
     for (int i = 0;; i++){
@@ -69,11 +88,7 @@ instruction_list *parseFile(char *path){
             if(symbol == EOF)
                 break;
             
-            last->next = malloc(sizeof(instruction_list));
-            if(last->next == NULL){
-                perror("Failed to allocate memory for list");
-                exit(1);
-            }
+            allocate(last->next);
             last = last->next;
             memset(buf, 0, BUFSIZE);
             i = -1;
@@ -83,5 +98,11 @@ instruction_list *parseFile(char *path){
     }
 
     fclose(fd);
-    return listHead;
+    return inst_headp;
+}
+
+void freeinsthead(inst_head *head){
+    freeinstlist(head->instructions);
+    freelabellist(head->labels);
+    free(head);
 }

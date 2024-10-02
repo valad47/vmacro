@@ -10,6 +10,7 @@
 
 #include "instructions.h"
 #include "debug.h"
+#include "utils.h"
 
 #define KEYBOARD "/dev/input/event0"
 
@@ -20,7 +21,7 @@ int fd = 0;
 
 typedef struct{
     int fd;
-    instruction_list* instructions;
+    inst_head* instructions;
 } mac_arg;
 
 int msleep(int ms){
@@ -140,7 +141,9 @@ void* doEvent(void* argv){
 
 void* executeMacro(void* argv){
     int fd = ((mac_arg*)argv)->fd;
-    instruction_list* instructions = ((mac_arg*)argv)->instructions;
+    inst_head* inst_head = ((mac_arg*)argv)->instructions;
+    label *labels = inst_head->labels;
+    instruction_list* instructions = inst_head->instructions;
     instruction_list* iter = instructions;
     printInstructions(instructions);
     while(1){
@@ -190,7 +193,7 @@ int main(int argc, char **argv){
 
     fd = createDevice("vmacro");
     /* Key press, report the event, send key release, and report again */
-    instruction_list* instructions = parseFile(argv[1]);
+    inst_head* instructions = parseFile(argv[1]);
 
     mac_arg args = {fd, instructions};
     pthread_create(&macexec, NULL, executeMacro, &args);
