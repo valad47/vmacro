@@ -15,6 +15,8 @@ void printInstructions(instruction_list *list){
         switch (list->cmd) {
             CASE(KEYPRESS, cmd)
             CASE(DELAY, cmd)
+            CASE(LABEL, cmd)
+            CASE(GOTO, cmd)
         }
         switch (list->state) {
             CASE(UP, state)
