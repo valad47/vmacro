@@ -10,6 +10,7 @@
 
 #include "instructions.h"
 #include "debug.h"
+#include "label.h"
 #include "utils.h"
 
 #define KEYBOARD "/dev/input/event0"
@@ -89,7 +90,7 @@ void deleteDevice(int fd){
 }
 
 void keyEvent(int fd, int key, int state){
-    emit(fd, EV_KEY, key, state);
+    emit(fd, EV_KEY, key, state-1);
     emit(fd, EV_SYN, SYN_REPORT, 0);
 }
 
@@ -156,15 +157,16 @@ void* executeMacro(void* argv){
                 case 0:
                     break;
                 case KEYPRESS:
-                    keyEvent(fd, iter->val, iter->state-1);
+                    keyEvent(fd, iter->val, iter->state);
                     break;
                 case DELAY:
                     msleep(iter->val);
                     break;
                 case GOTO:
+                    iter = getInstruction(labels, iter);
+                    continue;
                     break;
                 case LABEL:
-                    printf("%s\n", (char*)iter->val);
                     break;
                 default:
                     printf("Unknown instruction\n");

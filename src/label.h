@@ -9,4 +9,6 @@ struct label {
 
 typedef struct label label;
 
-void freelabellist(label* labels);
+void addLabel(label labels[static 1], instruction_list instruction[static 1]);
+instruction_list* getInstruction(const label labels[static 1], const instruction_list instruction[static 1]);
+void freelabellist(label labels[static 1]);

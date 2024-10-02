@@ -11,7 +11,7 @@
 
 #define BUFSIZE 128
 
-void proccessCode(char *code, instruction_list *node){
+void proccessCode(char *code, instruction_list *node, label *labels){
     memset(node, 0, sizeof(instruction_list));
 
     #define add_opt(a)\
@@ -54,7 +54,18 @@ void proccessCode(char *code, instruction_list *node){
             char* newWord = malloc(strlen(word)+1);
             strcpy(newWord, word);
             node->val = (int64_t)newWord;
+            addLabel(labels, node);
             return;
+        }
+        add_if(GOTO){
+            node->cmd = GOTO;
+            if(word == NULL){
+                printf("No label specified\n");
+                exit(1);
+            }
+            char* newWord = malloc(strlen(word)+1);
+            strcpy(newWord, word);
+            node->val = (int64_t)newWord;
         }
 
         word = strtok(NULL, " ");
@@ -95,7 +106,7 @@ inst_head *parseFile(char *path){
         }
         char symbol = getc(fd);
         if (symbol == '\n' || symbol == EOF){
-            proccessCode(buf, last);
+            proccessCode(buf, last, inst_headp->labels);
             if(symbol == EOF)
                 break;
             
