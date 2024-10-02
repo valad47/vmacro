@@ -23,7 +23,7 @@ void printInstructions(instruction_list *list){
             CASE(DOWN, state)
         }
 
-        printf("\t%s\t%s\t%d\n", state, cmd, list->val);
+        printf("\t%s\t%s\t%ld\n", state, cmd, list->val);
         list = list->next;
     }
     printf("-----------------------------------\n");
