@@ -127,7 +127,7 @@ void* doEvent(void* argv){
 
         if(keys[KEY_LEFTCTRL] == 1 && keys[KEY_RIGHTBRACE] && in_execution == 1){
             in_execution = false;
-            for(int i = 0; i <= 255; i++)
+            for(int i = 0; i <= KEY_MAX; i++)
                 keyEvent(fd, i, UP);
             system("notify-send \"vmacro\" \"Macro execution is paused\"");
         }
