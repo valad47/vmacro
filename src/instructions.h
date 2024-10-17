@@ -4,15 +4,18 @@
 #include <linux/uinput.h>
 
 //Definition of key position
-#define DOWN 2
-#define UP 1
+typedef enum{
+    UP = 1,
+    DOWN
+} State;
 
 //Posible instructions that macro uses
-#define KEYPRESS 1
-#define DELAY 2
-#define LABEL 3
-#define GOTO 4
-
+typedef enum{
+    KEYPRESS = 1,
+    DELAY,
+    LABEL,
+    GOTO
+} Instruction;
 //Mouse keycodes
 #define MOUSE1 BTN_LEFT
 #define MOUSE2 BTN_RIGHT
