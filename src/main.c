@@ -7,7 +7,6 @@
 #include <string.h>
 #include <sys/time.h>
 #include <pthread.h>
-#include <stdint.h>
 
 #include "instructions.h"
 #include "debug.h"
@@ -16,10 +15,7 @@
 
 #define KEYBOARD "/dev/input/event0"
 
-// Key to bit code
-#define KTB(a) (((__uint128_t)(1))<<a)
-
-__uint128_t keys = 0;
+uint8_t keys[255] = {0};
 bool in_execution = 0;
 uint8_t repeat = 0;
 int fd = 0;
@@ -111,7 +107,7 @@ void* readKeys(void* argv){
         }
 
         if(event.type == EV_KEY){
-	  keys = event.value > 0 ? keys|KTB(event.code) : keys^KTB(event.code);
+            keys[event.code] = event.value > 0 ? 1 : 0;
         }
     }
     return NULL;
@@ -119,24 +115,24 @@ void* readKeys(void* argv){
 
 void* doEvent(void* argv){
     while(msleep(1)){
-      if((KTB(KEY_Q)|KTB(KEY_LEFTCTRL)) == keys){
+        if(keys[KEY_Q] == 1 && keys[KEY_LEFTCTRL] == 1){
             system("notify-send \"vmacro\" \"Quiting...\"");
             exit(0);
         }
 
-      if((KTB(KEY_LEFTCTRL)|KTB(KEY_LEFTBRACE)) == keys && in_execution == 0){
+        if(keys[KEY_LEFTCTRL] == 1 && keys[KEY_LEFTBRACE] && in_execution == 0){
             in_execution = true;
             system("notify-send \"vmacro\" \"Playing macro...\"");
         }
 
-      if((KTB(KEY_LEFTCTRL)|KTB(KEY_RIGHTBRACE)) == keys && in_execution == 1){
+        if(keys[KEY_LEFTCTRL] == 1 && keys[KEY_RIGHTBRACE] && in_execution == 1){
             in_execution = false;
             for(int i = 0; i <= KEY_MAX; i++)
                 keyEvent(fd, i, UP);
             system("notify-send \"vmacro\" \"Macro execution is paused\"");
         }
 
-      if((KTB(KEY_R)|KTB(KEY_LEFTCTRL)) == keys && repeat == 0){
+        if(keys[KEY_R] == 1 && keys[KEY_LEFTCTRL] && repeat == 0){
             repeat = 1;
             system("notify-send \"vmacro\" \"Macro is set to repeat\"");
         }   
