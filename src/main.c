@@ -15,9 +15,9 @@
 
 #define KEYBOARD "/dev/input/event0"
 
-uint8_t keys[255] = {0};
-bool in_execution = 0;
-uint8_t repeat = 0;
+bool keys[255] = {0};
+bool in_execution = false;
+bool repeat = 0;
 int fd = 0;
 
 typedef struct{
@@ -113,39 +113,45 @@ void* readKeys(void* argv){
     return NULL;
 }
 
+void switchInstructions(char file[static 1]);
+
 void* doEvent(void* argv){
     while(msleep(1)){
-        if(keys[KEY_Q] == 1 && keys[KEY_LEFTCTRL] == 1){
+        if(keys[KEY_Q] && keys[KEY_LEFTCTRL]){
             system("notify-send \"vmacro\" \"Quiting...\"");
             exit(0);
         }
 
-        if(keys[KEY_LEFTCTRL] == 1 && keys[KEY_LEFTBRACE] && in_execution == 0){
+        if(keys[KEY_LEFTCTRL] && keys[KEY_LEFTBRACE] && in_execution == 0){
             in_execution = true;
             system("notify-send \"vmacro\" \"Playing macro...\"");
         }
 
-        if(keys[KEY_LEFTCTRL] == 1 && keys[KEY_RIGHTBRACE] && in_execution == 1){
+        if(keys[KEY_LEFTCTRL] && keys[KEY_RIGHTBRACE] && in_execution == 1){
             in_execution = false;
             for(int i = 0; i <= KEY_MAX; i++)
                 keyEvent(fd, i, UP);
             system("notify-send \"vmacro\" \"Macro execution is paused\"");
         }
 
-        if(keys[KEY_R] == 1 && keys[KEY_LEFTCTRL] && repeat == 0){
-            repeat = 1;
+        if(keys[KEY_R] && keys[KEY_LEFTCTRL] && !repeat){
+            repeat = true;
             system("notify-send \"vmacro\" \"Macro is set to repeat\"");
         }   
     } 
     return NULL;
 }
 
+instruction_list* instructions;
+instruction_list* iter;
+label *labels;
+
 void* executeMacro(void* argv){
     int fd = ((mac_arg*)argv)->fd;
     inst_head* inst_head = ((mac_arg*)argv)->instructions;
-    label *labels = inst_head->labels;
-    instruction_list* instructions = inst_head->instructions;
-    instruction_list* iter = instructions;
+    labels = inst_head->labels;
+    instructions = inst_head->instructions;
+    iter = instructions;
     printInstructions(instructions);
     while(1){
         while (iter != NULL){
@@ -186,6 +192,14 @@ void* executeMacro(void* argv){
     freeinstlist(instructions);
 }
 
+void switchInstructions(char file[static 1]) {
+  in_execution = false;
+  inst_head *inst_head = parseFile(file);
+  instructions = inst_head->instructions;
+  labels = inst_head->labels;
+  iter = instructions;
+}
+
 int main(int argc, char **argv){
     if(argc < 2){
         printf("Usage:\n\t%s [*.vmac]", argv[0]);
@@ -196,7 +210,7 @@ int main(int argc, char **argv){
     pthread_t macexec;
 
     pthread_create(&thread, NULL, readKeys, NULL);   
-    pthread_create(&thread2, NULL, doEvent, NULL); 
+    pthread_create(&thread2, NULL, doEvent, argv[1]); 
 
     fd = createDevice("vmacro");
     inst_head* instructions = parseFile(argv[1]);
