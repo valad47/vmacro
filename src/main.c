@@ -142,15 +142,16 @@ void* doEvent(void* argv){
     return NULL;
 }
 
-instruction_list* instructions;
-instruction_list* iter;
-label *labels;
+inst_head *_inst_head = NULL;
+instruction_list *instructions = NULL;
+instruction_list *iter = NULL;
+label *labels = NULL;
 
 void* executeMacro(void* argv){
     int fd = ((mac_arg*)argv)->fd;
-    inst_head* inst_head = ((mac_arg*)argv)->instructions;
-    labels = inst_head->labels;
-    instructions = inst_head->instructions;
+    _inst_head = ((mac_arg*)argv)->instructions;
+    labels = _inst_head->labels;
+    instructions = _inst_head->instructions;
     iter = instructions;
     printInstructions(instructions);
     while(1){
@@ -194,9 +195,14 @@ void* executeMacro(void* argv){
 
 void switchInstructions(char file[static 1]) {
   in_execution = false;
-  inst_head *inst_head = parseFile(file);
-  instructions = inst_head->instructions;
-  labels = inst_head->labels;
+  if (_inst_head == NULL) {
+    printf("[ERROR] Trying to reload file with NULL [inst_head]\n");
+    exit(1);
+  }
+  freeinsthead(_inst_head);
+  _inst_head = parseFile(file);
+  instructions = _inst_head->instructions;
+  labels = _inst_head->labels;
   iter = instructions;
 }
 
