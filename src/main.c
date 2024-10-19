@@ -122,12 +122,12 @@ void* doEvent(void* argv){
             exit(0);
         }
 
-        if(keys[KEY_LEFTCTRL] && keys[KEY_LEFTBRACE] && in_execution == 0){
+        if(keys[KEY_LEFTCTRL] && keys[KEY_LEFTBRACE] && !in_execution){
             in_execution = true;
             system("notify-send \"vmacro\" \"Playing macro...\"");
         }
 
-        if(keys[KEY_LEFTCTRL] && keys[KEY_RIGHTBRACE] && in_execution == 1){
+        if(keys[KEY_LEFTCTRL] && keys[KEY_RIGHTBRACE] && in_execution){
             in_execution = false;
             for(int i = 0; i <= KEY_MAX; i++)
                 keyEvent(fd, i, UP);
@@ -137,7 +137,16 @@ void* doEvent(void* argv){
         if(keys[KEY_R] && keys[KEY_LEFTCTRL] && !repeat){
             repeat = true;
             system("notify-send \"vmacro\" \"Macro is set to repeat\"");
-        }   
+        }
+
+	if(keys[KEY_R] && keys[KEY_LEFTALT]) {
+	  if(in_execution) {
+	    system("notify-send \"vmacro\" \"Can reload file only when macro execution is paused\"");
+	  } else {
+	    switchInstructions((char*)argv);
+	    system("notify-send \"vmacro\" \"Succesfully reloaded file. You can play macro after last delay is ended\"");
+	  }
+	}
     } 
     return NULL;
 }
