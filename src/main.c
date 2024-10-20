@@ -213,6 +213,7 @@ void switchInstructions(char file[static 1]) {
   instructions = _inst_head->instructions;
   labels = _inst_head->labels;
   iter = instructions;
+  printInstructions(instructions);
 }
 
 int main(int argc, char **argv){
