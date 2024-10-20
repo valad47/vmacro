@@ -52,7 +52,7 @@ void proccessCode(char *code, instruction_list *node, label *labels){
                 exit(1);
             }
             char* newWord = malloc(strlen(word)+1);
-            strcpy(newWord, word);
+	    strcpy(newWord, word);
             node->val = (int64_t)newWord;
             addLabel(labels, node);
             return;
@@ -97,7 +97,8 @@ inst_head *parseFile(char *path){
         exit(1);
     }
     memset(inst_headp->labels, 0, sizeof(label));
-    inst_headp->labels->label = "";
+    inst_headp->labels->label = malloc(sizeof(char));
+    *inst_headp->labels->label = 0;
     instruction_list *last = inst_headp->instructions;
 
     char *buf = malloc(BUFSIZE);
