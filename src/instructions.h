@@ -3,6 +3,8 @@
 #include "label.h"
 #include <linux/uinput.h>
 
+#define COMMENT '#'
+
 //Definition of key position
 typedef enum{
     UP = 1,

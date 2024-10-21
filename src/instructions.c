@@ -103,24 +103,39 @@ inst_head *parseFile(char *path){
 
     char *buf = malloc(BUFSIZE);
     int currentbuff = BUFSIZE;
+#define clear_buffer()			 \
+            buf = realloc(buf, BUFSIZE); \
+            memset(buf, 0, BUFSIZE);     \
+            currentbuff = BUFSIZE;       \
+            i = -1;
+
     for (int i = 0;; i++){
-        if(i+1>currentbuff){
+      
+      if(i+1>currentbuff){
             currentbuff += BUFSIZE;
             buf = realloc(buf, currentbuff);
             printf("New buffer size: %d\n", currentbuff);
         }
         char symbol = getc(fd);
+	if (symbol == COMMENT) {
+	  clear_buffer();
+	  for(;;){
+	    symbol = getc(fd);
+	    if (symbol == '\n' || symbol == EOF)
+	      break;
+	  }
+
+	  continue;
+	}
         if (symbol == '\n' || symbol == EOF){
+	   
             proccessCode(buf, last, inst_headp->labels);
             if(symbol == EOF)
                 break;
             
             last->next = malloc(sizeof(instruction_list));
             last = last->next;
-            buf = realloc(buf, BUFSIZE);
-            memset(buf, 0, BUFSIZE);
-            currentbuff = BUFSIZE;
-            i = -1;
+	    clear_buffer();
             continue;
         }
         buf[i] = symbol;
