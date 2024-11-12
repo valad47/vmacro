@@ -13,11 +13,12 @@
 #include "label.h"
 #include "utils.h"
 
-#define KEYBOARD "/dev/input/event0"
+#define KEYBOARD "/dev/input/event4"
 
 bool keys[255] = {0};
+bool prevKeys[255] = {0};
 bool in_execution = false;
-bool repeat = 0;
+bool repeat = false;
 int fd = 0;
 
 typedef struct{
@@ -94,61 +95,72 @@ void keyEvent(int fd, int key, int state){
     emit(fd, EV_SYN, SYN_REPORT, 0);
 }
 
-void* readKeys(void* argv){
-    int fd = open(KEYBOARD, O_RDONLY | O_NONBLOCK);
-    if(fd < 0){
-    	perror("Could not open keyboard");
-    	exit(1);
-    }
-    while(msleep(1)){
-        struct input_event event;
-        if(read(fd, &event, sizeof(struct input_event)) == -1){
-            continue;
-        }
-
-        if(event.type == EV_KEY){
-            keys[event.code] = event.value > 0 ? 1 : 0;
-        }
-    }
-    return NULL;
+void readKeys(int fd){
+  struct input_event event;
+  if(read(fd, &event, sizeof(struct input_event)) == -1){
+    return;
+  }
+  
+  if(event.type == EV_KEY){
+    keys[event.code] = event.value > 0 ? 1 : 0;
+  }
 }
 
 void switchInstructions(char file[static 1]);
 
-void* doEvent(void* argv){
-    while(msleep(1)){
-        if(keys[KEY_Q] && keys[KEY_LEFTCTRL]){
-            system("notify-send \"vmacro\" \"Quiting...\"");
-            exit(0);
-        }
+bool isPressed(int key) {
+  return (!keys[key]) && (prevKeys[key]);
+}
 
-        if(keys[KEY_LEFTCTRL] && keys[KEY_LEFTBRACE] && !in_execution){
-            in_execution = true;
-            system("notify-send \"vmacro\" \"Playing macro...\"");
-        }
+bool isHold(int key) {
+  return (prevKeys[key] == keys[key] || keys[key]);
+}
 
-        if(keys[KEY_LEFTCTRL] && keys[KEY_RIGHTBRACE] && in_execution){
-            in_execution = false;
-            for(int i = 0; i <= KEY_MAX; i++)
-                keyEvent(fd, i, UP);
-            system("notify-send \"vmacro\" \"Macro execution is paused\"");
-        }
+void hotkeys(void* argv){
+  if(isPressed(KEY_Q) && isHold(KEY_LEFTCTRL)){
+    system("notify-send \"vmacro\" \"Quiting...\"");
+    exit(0);
+  } 
+  else
+  if(isPressed(KEY_F8) && !in_execution){
+    in_execution = true;
+    system("notify-send \"vmacro\" \"Playing macro...\"");
+  }
+  else
+  if(isPressed(KEY_F8) && in_execution){
+    in_execution = false;
+    for(int i = 0; i <= KEY_MAX; i++)
+      keyEvent(fd, i, UP);
+    system("notify-send \"vmacro\" \"Macro execution is paused\"");
+  }
+  else
+  if(isPressed(KEY_R) && isHold(KEY_LEFTCTRL) && !repeat){
+    repeat = true;
+    system("notify-send \"vmacro\" \"Macro is set to repeat\"");
+  }
+  else
+  if(isPressed(KEY_R) && isHold(KEY_LEFTALT)) {
+    if(in_execution) {
+      system("notify-send \"vmacro\" \"Can reload file only when macro execution is paused\"");
+    } else {
+      switchInstructions((char*)argv);
+      system("notify-send \"vmacro\" \"Succesfully reloaded file. You can play macro after last delay is ended\"");
+    }
+  }
+}
 
-        if(keys[KEY_R] && keys[KEY_LEFTCTRL] && !repeat){
-            repeat = true;
-            system("notify-send \"vmacro\" \"Macro is set to repeat\"");
-        }
+void *eventLoop(void* argv) {
+  int fd = open(KEYBOARD, O_RDONLY | O_NONBLOCK);
+  if(fd < 0){
+    perror("Could not open keyboard");
+    exit(1);
+  }
 
-	if(keys[KEY_R] && keys[KEY_LEFTALT]) {
-	  if(in_execution) {
-	    system("notify-send \"vmacro\" \"Can reload file only when macro execution is paused\"");
-	  } else {
-	    switchInstructions((char*)argv);
-	    system("notify-send \"vmacro\" \"Succesfully reloaded file. You can play macro after last delay is ended\"");
-	  }
-	}
-    } 
-    return NULL;
+  while(msleep(1)) {
+    memcpy(prevKeys, keys, sizeof(bool)*255);
+    readKeys(fd);
+    hotkeys(argv);
+  }
 }
 
 inst_head *_inst_head = NULL;
@@ -222,11 +234,9 @@ int main(int argc, char **argv){
         return 0;
     }
     pthread_t thread;
-    pthread_t thread2;
     pthread_t macexec;
 
-    pthread_create(&thread, NULL, readKeys, NULL);   
-    pthread_create(&thread2, NULL, doEvent, argv[1]); 
+    pthread_create(&thread, NULL, eventLoop, argv[1]); 
 
     fd = createDevice("vmacro");
     inst_head* instructions = parseFile(argv[1]);
@@ -235,7 +245,6 @@ int main(int argc, char **argv){
     pthread_create(&macexec, NULL, executeMacro, &args);
 
     pthread_join(thread, NULL);
-    pthread_join(thread2, NULL);
 
     return 0;
 }
