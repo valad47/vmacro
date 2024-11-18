@@ -15,8 +15,8 @@
 
 #define KEYBOARD "/dev/input/event4"
 
-bool keys[255] = {0};
-bool prevKeys[255] = {0};
+bool keys[KEY_MAX] = {0};
+bool prevKeys[KEY_MAX] = {0};
 bool in_execution = false;
 bool repeat = false;
 int fd = 0;
@@ -113,7 +113,7 @@ bool isPressed(int key) {
 }
 
 bool isHold(int key) {
-  return (prevKeys[key] == keys[key] || keys[key]);
+  return (prevKeys[key] && keys[key] || keys[key]);
 }
 
 void hotkeys(void* argv){
@@ -122,12 +122,12 @@ void hotkeys(void* argv){
     exit(0);
   } 
   else
-  if(isPressed(KEY_F8) && !in_execution){
+  if(isPressed(KEY_KPPLUS) && !in_execution){
     in_execution = true;
     system("notify-send \"vmacro\" \"Playing macro...\"");
   }
   else
-  if(isPressed(KEY_F8) && in_execution){
+  if(isPressed(KEY_KPPLUS) && in_execution){
     in_execution = false;
     for(int i = 0; i <= KEY_MAX; i++)
       keyEvent(fd, i, UP);
